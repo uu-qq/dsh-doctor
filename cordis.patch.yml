@@ -6,3 +6,4 @@
         model: ''
         apiKeyEnv: DSH_DOCTOR_API_KEY
         timeoutMs: 20000
+        relay: 'auto'
