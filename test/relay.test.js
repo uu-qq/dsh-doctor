@@ -55,6 +55,29 @@ test("relay: 'off' 时中转规则整体禁用", () => {
   assert.equal(v.category, 'upstream')
 })
 
+test('通用覆盖：分组负载饱和（New API 典型话术，无需指纹）→ 中转站层', () => {
+  const v = classifyFailure({ status: 503, message: '当前分组上游负载已饱和，请稍后再试' })
+  assert.equal(v.category, 'relay')
+  assert.equal(v.rule, 'relay-channel-saturated')
+})
+
+test('通用覆盖：令牌额度用完（话术自带指纹）→ 站内余额', () => {
+  const v = classifyFailure({ status: 403, message: '该令牌额度已用完' })
+  assert.equal(v.category, 'relay')
+  assert.equal(v.rule, 'relay-account-balance')
+})
+
+test('通用覆盖：预扣费失败（New API 话术）→ 站内余额', () => {
+  const v = classifyFailure({ status: 403, message: '预扣费额度失败，用户剩余额度不足' })
+  assert.equal(v.category, 'relay')
+})
+
+test('通用覆盖：渠道不可用 → 无可用渠道家族', () => {
+  const v = classifyFailure({ status: 503, message: '渠道不可用' })
+  assert.equal(v.category, 'relay')
+  assert.equal(v.rule, 'relay-no-channel')
+})
+
 test('detectRelay：New API 版本头 → 确认中转站', () => {
   const d = detectRelay({ headers: { 'x-new-api-version': 'v1.2.3' } })
   assert.equal(d.isRelay, true)
