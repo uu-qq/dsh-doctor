@@ -96,6 +96,8 @@ DSH_DOCTOR_API_KEY=你的密钥 node lib/cli.js \
 探测时还会做**指纹识别**：New API / One API 的版本响应头、Cloudflare 痕迹、
 面板特有的错误类型，识别结果会写在探测报告里（`识别为中转站（new-api）：…`）。
 只有 Cloudflare 痕迹而没有其他证据时不会下结论 —— 官方 API 也可能套 CDN。
+探测同样识破中转站的**假 200**（HTTP 200 但 body 里是 error）：/models 和生成步
+都会拆开 body 核对，不会把坏渠道误报成健康（v0.2.2）。
 
 CLI 对应开关：默认开启中转规则，`--no-relay` 关闭。
 
